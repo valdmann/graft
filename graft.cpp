@@ -70,6 +70,7 @@ int main(int ac, char **av) {
         unshare_mount_namespace();
         unshare_root();
         bind_mount(pre1, pre2);
+        set_environment_variable("GRAFT", (pre1.string() + ':' + pre2.string()).c_str());
         set_environment_variable("OLDPWD", cwd.c_str());
         current_path(cwd = pre2 / suf);
         set_environment_variable("PWD", cwd.c_str());
