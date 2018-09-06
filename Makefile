@@ -1,7 +1,11 @@
+prefix ?= $(STOW_DIR)/graft
+
 graft : graft.cpp
 	g++ graft.cpp -o graft -std=c++17 -Os -l stdc++fs -Wall -Wextra -pedantic
 
+.PHONY: install
 install : graft
-	sudo chown root graft
-	sudo chmod u+s graft
-	mv graft ~/bin/graft
+	mkdir -p $(prefix)/bin
+	sudo cp graft $(prefix)/bin
+	sudo chown root $(prefix)/bin/graft
+	sudo chmod u+s $(prefix)/bin/graft
