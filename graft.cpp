@@ -29,7 +29,7 @@ vector<tuple<path, path>> parse_dot_graft(path p) {
 }
 
 vector<tuple<path, path>> read_dot_graft(path p) {
-    for (; !p.empty(); p = p.parent_path()) {
+    for (; p.has_relative_path(); p = p.parent_path()) {
         if (auto ps = parse_dot_graft(p); !ps.empty())
             return move(ps);
     }
