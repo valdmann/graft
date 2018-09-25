@@ -1,7 +1,7 @@
 prefix ?= $(STOW_DIR)/graft
 
 graft : graft.cpp
-	g++ graft.cpp -o graft -std=c++17 -Os -l stdc++fs -Wall -Wextra -pedantic
+	g++ graft.cpp -o graft -std=c++17 -Os -l stdc++fs -l fmt -Wall -Wextra -pedantic
 
 .PHONY: install
 install : graft
