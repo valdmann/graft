@@ -7,5 +7,4 @@ graft : graft.cpp
 install : graft
 	mkdir -p $(prefix)/bin
 	sudo cp graft $(prefix)/bin
-	sudo chown root $(prefix)/bin/graft
-	sudo chmod u+s $(prefix)/bin/graft
+	sudo setcap cap_sys_admin+ep $(prefix)/bin/graft
