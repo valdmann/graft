@@ -126,6 +126,7 @@ int main(int ac, char **av) {
     set_environment_variable("OLDPWD", cwd.c_str());
     current_path(new_cwd);
     set_environment_variable("PWD", new_cwd.c_str());
+    set_environment_variable("LD_LIBRARY_PATH", (path(getenv("HOME")) / "lib").c_str());
     vector<string> command(av+1, av+ac);
     if (command.empty())
         command.emplace_back(get_shell());
