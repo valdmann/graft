@@ -104,14 +104,33 @@ void set_environment_variable(const string_view &key, const string_view &value) 
         error() << errno;
 }
 
-path append_many(path p, path::iterator begin, const path::iterator end)
-{
+path append_many(path p, path::iterator begin, const path::iterator end) {
     while (begin != end)
         p /= *begin++;
     return p;
 }
 
+struct args {
+    bool verbose = false;
+    vector<string> command;
+
+    args(int ac, char **av) {
+        bool dd = false;
+        for (int i = 1; i < ac; ++i) {
+            if (dd)
+                command.push_back(av[i]);
+            else if (av[i] == "--"sv)
+                dd = true;
+            else if (av[i] == "-v"sv)
+                verbose = true;
+            else
+                command.push_back(av[i]);
+        }
+    }
+};
+
 int main(int ac, char **av) {
+    args args(ac, av);
     auto cwd = canonical(current_path());
     const auto ps = read_dot_graft(cwd);
     unshare_mount_namespace();
@@ -121,16 +140,19 @@ int main(int ac, char **av) {
         auto [src_it, cwd_it] = mismatch(src.begin(), src.end(), cwd.begin(), cwd.end());
         if (src_it == src.end())
             new_cwd = append_many(dst, cwd_it, cwd.end());
+        if (args.verbose)
+            cerr << "mount --bind " << src << ' ' << dst << '\n';
         bind_mount(src, dst);
     }
     set_environment_variable("OLDPWD", cwd.c_str());
+    if (args.verbose)
+        cerr << "cd " << new_cwd << '\n';
     current_path(new_cwd);
     set_environment_variable("PWD", new_cwd.c_str());
     set_environment_variable("LD_LIBRARY_PATH", (path(getenv("HOME")) / "lib").c_str());
-    vector<string> command(av+1, av+ac);
-    if (command.empty())
-        command.emplace_back(get_shell());
+    if (args.command.empty())
+        args.command.emplace_back(get_shell());
     seteuid(getuid());
-    exec(command);
+    exec(args.command);
     return 0;
 }
